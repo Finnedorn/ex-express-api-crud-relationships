@@ -3,26 +3,23 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 // importo RestErrorFormatter
 const RestErrorFormatter = require("../utils/restErrorFormatter");
+// importo slugify
+const slugify = require('slugify');
 
 // funzione di creazione di uno slug unique 
-function createUniqueSlug(title) {
-  let slug = title
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+const createUniqueSlug = async (title) => {
+  let slug = slugify(title, { lower: true });
   let uniqueSlug = slug;
   let count = 1;
-  existingSlugs=[];
-  while (existingSlugs.includes(uniqueSlug)) {
+
+  // Verifica se lo slug esiste già nel database
+  while (await prisma.post.findUnique({ where: { slug: uniqueSlug } })) {
     uniqueSlug = `${slug}-${count}`;
     count++;
   }
-  existingSlugs.push(uniqueSlug);
-  console.log(uniqueSlug);
+
   return uniqueSlug;
-}
+};
 
 
 
@@ -33,15 +30,19 @@ function createUniqueSlug(title) {
 
 // funzione di creazione di un elemento in db 
 const store = async (req, res, next) => {
-  const { title, slug, content, published } = req.body;
-  // const slug = createUniqueSlug(title);
+  const { title, content, published, categoryId, tags } = req.body;
   try {
+    const slug = await createUniqueSlug(title);
     const post = await prisma.post.create({
       data: {
         title,
         slug,
         content,
         published,
+        categoryId,
+        tags: {
+          connect: tags.map(tag => ({id: tag}))
+        }
       },
     });
     res.send(`Post creato con successo: ${JSON.stringify(post, null, 2)}`);
@@ -83,7 +84,6 @@ const index = async (req, res, next) => {
     }
 
     // gestisco la paginazione
-
     const offsetPage = (page - 1) * limit;
     const totalItems = await prisma.post.count({ where });
     const totalPages = Math.ceil(totalItems / limit);
@@ -114,6 +114,18 @@ const show = async (req, res, next) => {
       where: {
         slug,
       },
+      include: {
+        category: {
+            select: {
+                name: true
+            }
+        },
+        tags: {
+            select: {
+                name: true
+            }
+        }
+    }
     });
     if (slug) {
       res.json(post);
@@ -130,7 +142,7 @@ const show = async (req, res, next) => {
 const update = async (req, res, next) => {
   try {
     const { slug } = req.params;
-    const { title, content, published } = req.body;
+    const { title, content, published, categoryId, tags } = req.body;
     const post = await prisma.post.update({
       where: {
         slug,
@@ -139,6 +151,10 @@ const update = async (req, res, next) => {
         title,
         content,
         published,
+        categoryId,
+        tags: {
+          set: tags.map(id => ({id}))
+        }
       },
     });
     res.send(`Post aggiornato con successo: ${JSON.stringify(post, null, 2)}`);

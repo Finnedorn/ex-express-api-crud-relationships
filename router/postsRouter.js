@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const postsController = require('../controllers/postController');
 const validator = require('../middlewares/validator');
-const {slugChecker} = require('../validations/posts');
+const {slugChecker, bodyChecker} = require('../validations/posts');
 
 
 
-router.post('/', postsController.store);
+router.post('/', validator(bodyChecker), postsController.store);
 
 router.get('/', postsController.index);
 
