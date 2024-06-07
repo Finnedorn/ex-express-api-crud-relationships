@@ -80,9 +80,7 @@ const update = async (req, res) => {
         name,
       },
     });
-    res.send(
-      `Tag aggiornato con successo: ${JSON.stringify(tag, null, 2)}`
-    );
+    res.send(`Tag aggiornato con successo: ${JSON.stringify(tag, null, 2)}`);
   } catch (err) {
     const errorFormatter = new RestErrorFormatter(
       404,

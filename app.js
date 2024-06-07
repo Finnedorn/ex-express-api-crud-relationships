@@ -2,10 +2,10 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 const port = process.env.PORT || 3000;
-const postRouter = require('./router/postsRouter');
-const categoryRouter = require('./router/categoryRouter');
-const notFoundFormatter = require('./middlewares/404errorFormatter');
-const allErrorFormatter = require('./middlewares/allErrorFormatter');
+const postRouter = require("./router/postsRouter");
+const categoryRouter = require("./router/categoryRouter");
+const notFoundFormatter = require("./middlewares/404errorFormatter");
+const allErrorFormatter = require("./middlewares/allErrorFormatter");
 
 app.use(express.json());
 
@@ -18,5 +18,5 @@ app.use(notFoundFormatter);
 app.use(allErrorFormatter);
 
 app.listen(port, () => {
-    console.log(`Sto runnando il server sulla porta: ${port}`);
+  console.log(`Sto runnando il server sulla porta: ${port}`);
 });

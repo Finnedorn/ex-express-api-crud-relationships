@@ -4,9 +4,9 @@ const prisma = new PrismaClient();
 // importo RestErrorFormatter
 const RestErrorFormatter = require("../utils/restErrorFormatter");
 // importo slugify
-const slugify = require('slugify');
+const slugify = require("slugify");
 
-// funzione di creazione di uno slug unique 
+// funzione di creazione di uno slug unique
 const createUniqueSlug = async (title) => {
   let slug = slugify(title, { lower: true });
   let uniqueSlug = slug;
@@ -21,14 +21,7 @@ const createUniqueSlug = async (title) => {
   return uniqueSlug;
 };
 
-
-
-
-
-
-
-
-// funzione di creazione di un elemento in db 
+// funzione di creazione di un elemento in db
 const store = async (req, res, next) => {
   const { title, content, published, categoryId, tags } = req.body;
   try {
@@ -41,21 +34,23 @@ const store = async (req, res, next) => {
         published,
         categoryId,
         tags: {
-          connect: tags.map(tag => ({id: tag}))
-        }
+          connect: tags.map((tag) => ({ id: tag })),
+        },
       },
     });
     res.send(`Post creato con successo: ${JSON.stringify(post, null, 2)}`);
   } catch (error) {
     // storo in una const la nuova istanza di RestErrorFormatter contente lo status e il message da me personlizzato
-    const errorFormatter = new RestErrorFormatter(404, `Errore nella creazione del post: ${error}`);
+    const errorFormatter = new RestErrorFormatter(
+      404,
+      `Errore nella creazione del post: ${error}`
+    );
     // passo il tutto che verrà intercettato dal middleware di gestione errori (allErrorFormatter)
     next(errorFormatter);
   }
 };
 
-
-// funzione di recupero di tutti i più elementi dal db, filtrati e paginati 
+// funzione di recupero di tutti i più elementi dal db, filtrati e paginati
 const index = async (req, res, next) => {
   try {
     // creo una const dove storerò gli elementi
@@ -65,7 +60,7 @@ const index = async (req, res, next) => {
     const { published, content, title, page = 1, limit = 10 } = req.query;
 
     // controllo gli elementi in query
-    // ed ne storo i valori in where 
+    // ed ne storo i valori in where
     if (published === "true") {
       where.published = true;
     } else if (published === "false") {
@@ -73,9 +68,9 @@ const index = async (req, res, next) => {
     }
 
     if (content) {
-        // equivale a scrivere where: {
-        //     content: { contains: content }
-        // } 
+      // equivale a scrivere where: {
+      //     content: { contains: content }
+      // }
       where.content = { contains: content };
     }
 
@@ -88,19 +83,17 @@ const index = async (req, res, next) => {
     const totalItems = await prisma.post.count({ where });
     const totalPages = Math.ceil(totalItems / limit);
 
-    const posts = await prisma.post.findMany({ 
-        where,
-        take: limit,
-        skip: offsetPage,
-     });
-    res.json(
-        posts,
-        parseInt(page),
-        totalPages,
-        totalItems,
-    );
+    const posts = await prisma.post.findMany({
+      where,
+      take: limit,
+      skip: offsetPage,
+    });
+    res.json(posts, parseInt(page), totalPages, totalItems);
   } catch (error) {
-    const errorFormatter = new RestErrorFormatter(404, `Errore nei parametri passati per la ricerca: ${error}`);
+    const errorFormatter = new RestErrorFormatter(
+      404,
+      `Errore nei parametri passati per la ricerca: ${error}`
+    );
     next(errorFormatter);
   }
 };
@@ -116,16 +109,16 @@ const show = async (req, res, next) => {
       },
       include: {
         category: {
-            select: {
-                name: true
-            }
+          select: {
+            name: true,
+          },
         },
         tags: {
-            select: {
-                name: true
-            }
-        }
-    }
+          select: {
+            name: true,
+          },
+        },
+      },
     });
     if (slug) {
       res.json(post);
@@ -133,7 +126,10 @@ const show = async (req, res, next) => {
       res.status("401").send("errore");
     }
   } catch (error) {
-    const errorFormatter = new RestErrorFormatter(404, `Errore nei parametri passati per la ricerca: ${error}`);
+    const errorFormatter = new RestErrorFormatter(
+      404,
+      `Errore nei parametri passati per la ricerca: ${error}`
+    );
     next(errorFormatter);
   }
 };
@@ -153,13 +149,16 @@ const update = async (req, res, next) => {
         published,
         categoryId,
         tags: {
-          set: tags.map(id => ({id}))
-        }
+          set: tags.map((id) => ({ id })),
+        },
       },
     });
     res.send(`Post aggiornato con successo: ${JSON.stringify(post, null, 2)}`);
   } catch {
-    const errorFormatter = new RestErrorFormatter(404, `Errore nei parametri passati per l'operazione di update : ${error}`);
+    const errorFormatter = new RestErrorFormatter(
+      404,
+      `Errore nei parametri passati per l'operazione di update : ${error}`
+    );
     next(errorFormatter);
   }
 };
@@ -175,7 +174,10 @@ const destroy = async (req, res, next) => {
     });
     res.send("Post eliminato con successo");
   } catch {
-    const errorFormatter = new RestErrorFormatter(404, `Errore nei parametri passati l'operazione di delete : ${error}`);
+    const errorFormatter = new RestErrorFormatter(
+      404,
+      `Errore nei parametri passati l'operazione di delete : ${error}`
+    );
     next(errorFormatter);
   }
 };

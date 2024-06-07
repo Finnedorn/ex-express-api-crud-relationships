@@ -92,7 +92,7 @@ const update = async (req, res) => {
   }
 };
 
-// funzione di delete di un elemento selezionato tramite id 
+// funzione di delete di un elemento selezionato tramite id
 const destroy = async (req, res) => {
   try {
     const { id } = req.params;

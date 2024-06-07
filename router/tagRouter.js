@@ -1,20 +1,23 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const tagController = require('../controllers/tagController');
-const validator = require('../middlewares/validator');
-const {nameChecker} = require('../validations/tags');
-const {idChecker} = require('../validations/ids');
+const tagController = require("../controllers/tagController");
+const validator = require("../middlewares/validator");
+const { nameChecker } = require("../validations/tags");
+const { idChecker } = require("../validations/ids");
 
+router.post("/", validator(nameChecker), tagController.store);
 
+router.get("/", tagController.index);
 
-router.post('/', validator(nameChecker), tagController.store);
+router.get("/:id", validator(idChecker), tagController.show);
 
-router.get('/', tagController.index);
+router.put(
+  "/:id",
+  validator(idChecker),
+  validator(nameChecker),
+  tagController.update
+);
 
-router.get('/:id', validator(idChecker), tagController.show);
-
-router.put('/:id', validator(idChecker), validator(nameChecker), tagController.update);
-
-router.delete('/:id', validator(idChecker), tagController.destroy);
+router.delete("/:id", validator(idChecker), tagController.destroy);
 
 module.exports = router;
