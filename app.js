@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 require("dotenv").config();
-const port = process.env.PORT || 3000;
+const port = 3000;
 const postRouter = require('./router/postsRouter');
 const notFoundFormatter = require('./middlewares/404errorFormatter');
 const allErrorFormatter = require('./middlewares/allErrorFormatter');
