@@ -15,13 +15,13 @@ const nameChecker = {
         },
         custom : {
             options: async(value) =>{
-                const nameToFind = await prisma.category.findFirst({
+                const nameToFind = await prisma.tag.findFirst({
                     where: {
                         name : value
                     }
                 })
                 if(nameToFind){
-                    throw new Error('Esiste già una Categoria con quel Name');
+                    throw new Error('Esiste già un Tag con quel Name');
                 }
                 return true;
             }

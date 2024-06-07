@@ -56,7 +56,7 @@ const bodyChecker = {
     published: {
         in: ["body"],
         isBoolean: {
-            error: "Published deve essere un boolean"
+            error: "Published deve essere un booleano"
         }
     },
     categoryId: {
@@ -81,11 +81,22 @@ const bodyChecker = {
     },
     tags: {
         in: ["body"],
+        notEmpty: {
+            errorMessage: "Tags è un campo obbligatorio.",
+            bail: true
+        },
         isArray: {
             error : "Tags deve essere un array"
         },
         custom: {
             options: async (array) => {
+                if(array.length === 0){
+                    throw new Error('i Tags devono contenere almeno un elemento');
+                }
+                const notIntegerId = array.find(el => isNaN(parseInt(el)));
+                if(notIntegerId){
+                    throw new Error('Uno o più ID di Tags non sono costituiti da numeri interi');
+                }
                 const tagsToFind = await prisma.tag.findMany({
                     where: {
                         id : {
