@@ -13,7 +13,7 @@ const store = async (req, res, next) => {
         name,
       },
     });
-    res.send(`Tag creato con successo: ${tag}`);
+    res.send(`Tag creato con successo: ${JSON.stringify(tag, null, 2)}`);
   } catch (error) {
     const errorFormatter = new RestErrorFormatter(
       404,

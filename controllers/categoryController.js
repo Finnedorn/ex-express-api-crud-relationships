@@ -13,7 +13,7 @@ const store = async (req, res, next) => {
         name,
       },
     });
-    res.send(`Categoria creata con successo: ${category}`);
+    res.send(`Categoria creata con successo: ${JSON.stringify(category, null, 2)}`);
   } catch (error) {
     const errorFormatter = new RestErrorFormatter(
       404,

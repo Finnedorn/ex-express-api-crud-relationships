@@ -87,6 +87,18 @@ const index = async (req, res, next) => {
       where,
       take: limit,
       skip: offsetPage,
+      include: {
+        category: {
+          select: {
+            name: true,
+          },
+        },
+        tags: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
     res.json(posts, parseInt(page), totalPages, totalItems);
   } catch (error) {

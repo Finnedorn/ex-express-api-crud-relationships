@@ -101,10 +101,8 @@ const bodyChecker = {
         const tagsToFind = await prisma.tag.findMany({
           where: {
             id: {
-              in: {
-                array,
-              },
-            },
+              in:array
+            }
           },
         });
         if (tagsToFind.length !== array.length) {
